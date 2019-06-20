@@ -2,7 +2,7 @@
 ### A simple browser based trivia game built with JavaScript
 
 #### TASKS
-- [ ] Write simple algorithm for game
+- [x] Write simple algorithm for game
 - [ ] Write JavaScript program following algorithm
 - [ ] Sketch front end design
 - [ ] Code front end design
