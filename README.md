@@ -4,6 +4,7 @@
 #### TASKS
 - [x] Write simple algorithm for game
 - [x] Write JavaScript program following algorithm
+- [ ] Find gifs for each question and add to alerts
 - [ ] Code front end design
 - [ ] Clean up JavaScript
 
