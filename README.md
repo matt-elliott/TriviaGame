@@ -3,8 +3,7 @@
 
 #### TASKS
 - [x] Write simple algorithm for game
-- [ ] Write JavaScript program following algorithm
-- [ ] Sketch front end design
+- [x] Write JavaScript program following algorithm
 - [ ] Code front end design
 - [ ] Clean up JavaScript
 
