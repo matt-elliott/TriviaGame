@@ -14,23 +14,21 @@
     <header class="container">
       <h1 class="text-center">Game of Thrones Trivia Game</h1>
     </header>
-    <div class="container">
+    <div class="container" id="clock">
       <span>00:</span><span id="counter">00</span>
     </div>
     <div id="content-wrapper" class="container">
       <section class="row">
-        <article class="col-5 content" id="start-screem">
-          <button class="btn start" type="button">Start</button>
-        </article>
-      </section>
-      <section class="row">
-        <article class="col-5 questionCard">
+        <article class="col-12 questionCard text-center">
+          <button class="btn" id="start" type="button">Start</button>
           <h4 id="question"></h4>
-          <ul id="answers">
+          <ul id="answers" class="list-unstyled">
           </ul>
         </article>
       </section>
-      <aside id="alert"></aside>
+    </div>
+    <aside id="alert">
+    </aside>
     </div>
 
     

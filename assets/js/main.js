@@ -54,6 +54,9 @@ var game = {
     this.questionElement = $('#question');
     this.answerElement = $('#amswers');
 
+    $('#start').remove();
+    $('#alert').hide();
+
     this.askQuestions();
   },
   countDown: function() {
@@ -153,4 +156,7 @@ var game = {
   }
 }
 
-$('document').ready( game.init() );
+$('document').ready( function() {
+  $('#alert').hide();
+  $('#start').on('click', game.init.bind(game));
+});
