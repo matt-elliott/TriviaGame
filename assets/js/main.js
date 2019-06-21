@@ -4,6 +4,8 @@ var game = {
     this.points = 0;
     this.thirtySecondTimer = null;
     this.questionTimeout = 30;
+    this.loseGameGif = `<img src="https://media.giphy.com/media/W81qSImkIxkNq">/giphy.gif`;
+    this.winGameGif = `<img src="https://media.giphy.com/media/1tGN00iMCj3Mc/giphy.gif">`;
     this.questions = [
       {
         question: 'Does John Snow know nothing?',
@@ -11,7 +13,8 @@ var game = {
           'Nope, John Snow knows everything',
           'It\'s Jon Snow you uncultured swine!'
         ],
-        correctAnswer: 0
+        correctAnswer: 0,
+        gif: `<img src="https://media.giphy.com/media/ox0XTZD6N4SIg/giphy.gif">`
       },
       {
         question: 'Which name is given to the bastards of The Reach?',
@@ -19,7 +22,8 @@ var game = {
           'Poppies',
           'Flowers'
         ],
-        correctAnswer: 2
+        correctAnswer: 2,
+        gif: `<img src="https://media.giphy.com/media/1iAQLpW2DRW2k/giphy.gif">`
       },
       {
         question: 'Which House is a direct vassal of House Baratheon of King\'s Landing?',
@@ -27,7 +31,8 @@ var game = {
           'House Stark',
           'House Stokeworth'
         ],
-        correctAnswer: 2
+        correctAnswer: 2,
+        gif: `<img src="https://media.giphy.com/media/R9B9P4hRMYJr2/giphy.gif">`
       },
       {
         question: 'At Hoster Tully\'s funeral, who shot the burning arrow that hit its mark?',
@@ -36,7 +41,8 @@ var game = {
           'Bogdon Stank',
                     
         ],
-        correctAnswer: 0
+        correctAnswer: 0,
+        gif: `<img src="https://media.giphy.com/media/picnPPoGf0yhG/giphy.gif">`
       },
       {
         question: 'How many fingertips did Stannis Baratheon chop off of Davos\' hand(s)?',
@@ -44,7 +50,8 @@ var game = {
           'Four',
           'None, he cut off his ears.'
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        gif: `<img src="https://media.giphy.com/media/3o7buahdzxQjWxgx1K/giphy.gif">`
       }
     ];
     this.askedQuestions = [];
@@ -75,9 +82,6 @@ var game = {
   },
   askQuestions: function() {
     $('#alert').hide();
-    // console.log('asking question');
-    // 1. get random question/answers and show to user
-    // console.log(game.count < game.questionsLength);
 
     if (this.questions.length === 0) {
       var pointsToWin = Math.floor(this.askedQuestions.length * .65);
@@ -97,13 +101,14 @@ var game = {
         ).toString(8);
 
       this.randomQuestionObject = this.questions[this.questionIndex];
-
       this.randomQuestion = this.randomQuestionObject.question;
       this.answers = this.randomQuestionObject.answers;
       this.correctAnswer = this.randomQuestionObject.correctAnswer;
+      this.questionGif = this.randomQuestionObject.gif;
+      console.log(this);
       this.questionDOMElement.text(this.randomQuestion);
       
-      game.answerDOMElement.empty();
+      this.answerDOMElement.empty();
       this.answers.forEach(function(answer) {
         game.answerDOMElement.append(`<li class="answer">${answer}</li>`);
       });
@@ -145,7 +150,8 @@ var game = {
   },
   showCorrectAnswer: function() {
     $('#alert').append(`<h3>Correct answer is ${game.answers[game.correctAnswer]}</h3>`).show();
-  
+    console.log(game.gif);
+    $('#alert').append(game.questionGif);
     //restart question asking
     this.restart();
   },
