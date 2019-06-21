@@ -2,11 +2,8 @@ var game = {
   init: function () {
     this.count = 0;
     this.points = 0;
-    this.questionTimeOut;
-    this.questionDOMElement = $('.questionCard #question');
-    this.answerDOMElement = $('.questionCard #answers');
-    this.questionElement = $('#question');
-    this.answerElement = $('#amswers');
+    this.thirtySecondTimer = null;
+    this.questionTimeout = 30;
     this.questions = [
       {
         question: 'Does John Snow know nothing?',
@@ -51,32 +48,45 @@ var game = {
       }
     ];
     this.askedQuestions = [];
-    
+    this.counterDOMElement = $('#counter');
+    this.questionDOMElement = $('.questionCard #question');
+    this.answerDOMElement = $('.questionCard #answers');
+    this.questionElement = $('#question');
+    this.answerElement = $('#amswers');
+
     this.askQuestions();
   },
-  ask: function() {
-    // this.timer = setInterval(this.ask, 3000);
-    //this.startClock();
-    // this.ask();
+  countDown: function() {
+    var date = new Date();
+    var time = --this.questionTimeout;
+    date.setSeconds(time);
+    var seconds = date.toISOString().substr(17, 2);
+    this.counterDOMElement.text(seconds);
+
+    if(time === 00) {
+      clearInterval(this.thirtySecondTimer);
+      this.thirtySecondTimer = null;
+      this.questionTimeout = 30;
+      this.timeOut();
+    }
   },
   askQuestions: function() {
+    $('#alert').hide();
     // console.log('asking question');
     // 1. get random question/answers and show to user
     // console.log(game.count < game.questionsLength);
 
     if (this.questions.length === 0) {
-      // 1. stop timer
-      clearTimeout(this.questionTimeOut);
       var pointsToWin = Math.floor(this.askedQuestions.length * .65);
       
-      $('.questionCard').html('<h1>Game Over!</h1>');
+      $('#alert').html('<h1>Game Over!</h1>').show();
 
       if(this.points > pointsToWin) {
-        $('.questionCard').append('<h2>You Win!</h2>');
+        $('#alert').append('<h2>You Win!</h2>');
       } else if(this.points === pointsToWin) {
-        $('.questionCard').append('<h2>You Tied!</h2>');
+        $('#alert').append('<h2>You Tied!</h2>');
       } else {
-        $('.questionCard').append('<h2>You Lose!</h2>');
+        $('#alert').append('<h2>You Lose!</h2>');
       }
     } else {
       this.questionIndex =  Math.ceil(
@@ -88,9 +98,9 @@ var game = {
       this.randomQuestion = this.randomQuestionObject.question;
       this.answers = this.randomQuestionObject.answers;
       this.correctAnswer = this.randomQuestionObject.correctAnswer;
-
       this.questionDOMElement.text(this.randomQuestion);
       
+      game.answerDOMElement.empty();
       this.answers.forEach(function(answer) {
         game.answerDOMElement.append(`<li class="answer">${answer}</li>`);
       });
@@ -100,9 +110,9 @@ var game = {
       this.questions.splice(this.questionIndex, 1);
 
       //start 30 second countdown
-      this.questionTimeOut = setTimeout(
-        this.showCorrectAnswer,
-      2000);
+      this.thirtySecondTimer = setInterval(
+        game.countDown.bind(game),
+      1000);
       
       //   2. add listener click on answers and call answered()
       $('.questionCard .answer').on('click', this.answered);
@@ -114,22 +124,32 @@ var game = {
   },
   answered: function() {
     // clear all timers
+    clearInterval(game.thirtySecondTimer);
+    game.thirtySecondTimer = null;
+
     if($(event.currentTarget).text() === game.answers[game.correctAnswer]) {
-      console.log('right answer!')
+      $('#alert').html(`<h1>That's Right!</h1>`);
       game.points++;
     } else {
       //play ouch sound
+      $('#alert').html(`<h1>Nope!</h1>`);
     }
+    game.showCorrectAnswer();
   },
-  startClock: function() {
-    // console.log('startCLock');
+  timeOut: function() {
+    $('#alert').html(`<h1>Times up!</h1>`).show();
+    this.showCorrectAnswer();
   },
   showCorrectAnswer: function() {
-    console.log(`Times up!\nCorrect answer is ${game.answers[game.correctAnswer]} `);
-    $('.questionCard #answers').empty();
-
+    $('#alert').append(`<h3>Correct answer is ${game.answers[game.correctAnswer]}</h3>`).show();
+  
     //restart question asking
-    game.askQuestions();
+    this.restart();
+  },
+  restart: function() {
+    this.thirtySecondTimer = null;
+    this.questionTimeout = 30;
+    setTimeout(game.askQuestions.bind(game), 5000);
   }
 }
 
