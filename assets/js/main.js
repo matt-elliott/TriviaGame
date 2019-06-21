@@ -1,9 +1,10 @@
 var game = {
   init: function () {
     this.count = 0;
+    this.points = 0;
+    this.questionTimeOut;
     this.questionDOMElement = $('.questionCard #question');
     this.answerDOMElement = $('.questionCard #answers');
-    this.points = 0;
     this.questionElement = $('#question');
     this.answerElement = $('#amswers');
     this.questions = [
@@ -13,8 +14,7 @@ var game = {
           'Nope, John Snow knows everything',
           'It\'s Jon Snow you uncultured swine!'
         ],
-        correctAnswer: 0,
-        points: 1
+        correctAnswer: 0
       },
       {
         question: 'Which name is given to the bastards of The Reach?',
@@ -22,8 +22,7 @@ var game = {
           'Poppies',
           'Flowers'
         ],
-        correctAnswer: 2,
-        points: 5
+        correctAnswer: 2
       },
       {
         question: 'Which House is a direct vassal of House Baratheon of King\'s Landing?',
@@ -31,8 +30,7 @@ var game = {
           'House Stark',
           'House Stokeworth'
         ],
-        correctAnswer: 2,
-        points: 22
+        correctAnswer: 2
       },
       {
         question: 'At Hoster Tully\'s funeral, who shot the burning arrow that hit its mark?',
@@ -41,8 +39,7 @@ var game = {
           'Bogdon Stank',
                     
         ],
-        correctAnswer: 0,
-        points: 20
+        correctAnswer: 0
       },
       {
         question: 'How many fingertips did Stannis Baratheon chop off of Davos\' hand(s)?',
@@ -50,98 +47,88 @@ var game = {
           'Four',
           'None, he cut off his ears.'
         ],
-        correctAnswer: 1,
-        points: 100000
-      
+        correctAnswer: 1
       }
     ];
-    this.answeredQuestions = [];
-    this.questionsLength = Object.keys(this.questions).length;
-
+    this.askedQuestions = [];
+    
     this.askQuestions();
   },
-  askQuestions: function() {
+  ask: function() {
     // this.timer = setInterval(this.ask, 3000);
     //this.startClock();
-    game.ask();
+    // this.ask();
   },
-  ask: function() {
+  askQuestions: function() {
     // console.log('asking question');
     // 1. get random question/answers and show to user
     // console.log(game.count < game.questionsLength);
 
-    if (game.count < game.questionsLength) {
-      game.questionIndex = Math.ceil(
-                            Math.random() * game.questions.length - 1
-                          ).toString(8);
-      game.randomQuestionObject = game.questions[game.questionIndex];
-      console.log(game.questionIndex);
-      game.randomQuestion = game.randomQuestionObject.question;
-      game.answers = game.randomQuestionObject.answers;
-      game.correctAnswer = game.randomQuestionObject.correctAnswer;
-
-      game.questionDOMElement.text(game.randomQuestion);
+    if (this.questions.length === 0) {
+      // 1. stop timer
+      clearTimeout(this.questionTimeOut);
+      var pointsToWin = Math.floor(this.askedQuestions.length * .65);
       
-      game.answers.forEach(function(answer) {
+      $('.questionCard').html('<h1>Game Over!</h1>');
+
+      if(this.points > pointsToWin) {
+        $('.questionCard').append('<h2>You Win!</h2>');
+      } else if(this.points === pointsToWin) {
+        $('.questionCard').append('<h2>You Tied!</h2>');
+      } else {
+        $('.questionCard').append('<h2>You Lose!</h2>');
+      }
+    } else {
+      this.questionIndex =  Math.ceil(
+          Math.random() * this.questions.length - 1
+        ).toString(8);
+
+      this.randomQuestionObject = this.questions[this.questionIndex];
+
+      this.randomQuestion = this.randomQuestionObject.question;
+      this.answers = this.randomQuestionObject.answers;
+      this.correctAnswer = this.randomQuestionObject.correctAnswer;
+
+      this.questionDOMElement.text(this.randomQuestion);
+      
+      this.answers.forEach(function(answer) {
         game.answerDOMElement.append(`<li class="answer">${answer}</li>`);
       });
       
-      //setTimeout for 1500 to show to correct answer
-      game.questionTimeOut = setTimeout(game.showAnswer, 2000);
+      //remove question from questions object and move to answered
+      this.askedQuestions.push(this.questions[this.questionIndex]);
+      this.questions.splice(this.questionIndex, 1);
+
+      //start 30 second countdown
+      this.questionTimeOut = setTimeout(
+        this.showCorrectAnswer,
+      2000);
       
       //   2. add listener click on answers and call answered()
-      $('.questionCard .answer').on('click', game.answered);
+      $('.questionCard .answer').on('click', this.answered);
+    } 
 
-      // console.log('count', game.count);
-      // console.log(game.randomQuestion);
-      // console.log(game.answers);
-      // console.log(game.correctAnswer);
-    } else {
-      // if(game.count === game.questions.length)
-      // console.log('game over');
-      $('.questionCard').html('<h1>YOU LOSE</h1>');
-      // 
-      //   1. stop timer
-      //   2. add total points and set equal to totalPoints
-      
-
-      console.log(game.points);
-      //   3. add points of correct answers and set equal to points
-      //   4. if points < totalPoints
-      //     - call winGame()
-      //   5. if points > totalPoints = win
-      //     - call loseGame()      
-      //   6. else if points === totalPoints
-      //     - call drawGame()
-      // }
-    }
     //   4. increment count by one}
-    game.count++;
+    this.count++;
   
   },
   answered: function() {
     // clear all timers
     if($(event.currentTarget).text() === game.answers[game.correctAnswer]) {
       console.log('right answer!')
-      game.points += game.randomQuestionObject.points
-      
-      //remove question from questions object and move to answered
-      // console.log(game.answeredQuestions);
-      console.log(game.questions[game.questionIndex]);
-      game.answeredQuestions.push(game.questions[game.questionIndex]);
-      game.questions.splice(0, game.questionIndex);
-      console.log(game.questions);
-
-      console.log(game.answeredQuestions);
-      console.log(game.questions);
+      game.points++;
+    } else {
+      //play ouch sound
     }
   },
   startClock: function() {
     // console.log('startCLock');
   },
-  showAnswer: function() {
-    // console.log(`Times up!\nCorrect answer is ${game.answers[game.correctAnswer]} `);
+  showCorrectAnswer: function() {
+    console.log(`Times up!\nCorrect answer is ${game.answers[game.correctAnswer]} `);
     $('.questionCard #answers').empty();
+
+    //restart question asking
     game.askQuestions();
   }
 }
